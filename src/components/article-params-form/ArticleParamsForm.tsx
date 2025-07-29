@@ -13,19 +13,14 @@ type ArticleSetting = typeof defaultArticleState;
 interface ArticleParamsFormProps {
 	appliedSettings: ArticleSetting;
 	onApply: (newSettings: ArticleSetting) => void;
-	onReset: () => void;
-	isOpen: boolean;
-	onClose: () => void;
 }
 
 export const ArticleParamsForm = ({
 	appliedSettings,
 	onApply,
-	onReset,
-	isOpen,
-	onClose,
 }: ArticleParamsFormProps) => {
 	const [formSettings, setFormSettings] = useState<ArticleSetting>(appliedSettings);
+	const [isOpen, setIsOpen] = useState(false);
 	const asideRef = useRef<HTMLElement | null>(null);
 
 	useEffect(() => {
@@ -41,7 +36,7 @@ export const ArticleParamsForm = ({
 			if (
 				asideRef.current && !asideRef.current.contains(event.target as Node)
 			) {
-				onClose();
+				setIsOpen(false);
 			}
 		};
 
@@ -49,12 +44,12 @@ export const ArticleParamsForm = ({
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 		};
-	}, [isOpen, onClose]);
+	}, [isOpen]);
 
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={onClose} />
+			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside
 			ref={asideRef}
 			className={clsx(styles.container, isOpen && styles.container_open)}>
@@ -65,7 +60,7 @@ export const ArticleParamsForm = ({
 				}}
 				onReset={(e) => {
 					e.preventDefault();
-					onReset();
+					onApply(defaultArticleState);
 					setFormSettings(defaultArticleState);
 				}}
 				>

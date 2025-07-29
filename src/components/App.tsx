@@ -7,7 +7,6 @@ import { CSSProperties, useState } from 'react';
 
 export const App = () => {
 	const [appliedSettings, setAppliedSettings] = useState(defaultArticleState);
-	const [isSidebarOpen, setSidebarOpen] = useState(false);
 
 	return (
 		<main
@@ -24,9 +23,6 @@ export const App = () => {
 			<ArticleParamsForm 
                 appliedSettings={appliedSettings}
                 onApply={setAppliedSettings}
-                onReset={() => setAppliedSettings(defaultArticleState)}
-				isOpen={isSidebarOpen}
-				onClose={() => setSidebarOpen(!isSidebarOpen)}
 			/>
 			<Article />
 		</main>
