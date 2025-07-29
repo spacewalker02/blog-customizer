@@ -1,95 +1,116 @@
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
-import { backgroundColors, contentWidthArr, fontColors, fontSizeOptions, OptionType } from 'src/constants/articleProps';
+import { backgroundColors, contentWidthArr, fontColors, fontSizeOptions, OptionType, fontFamilyOptions, defaultArticleState } from 'src/constants/articleProps';
 import clsx from 'clsx';
 import { Select } from 'src/ui/select';
-import { fontFamilyOptions } from 'src/constants/articleProps';
 import { Separator } from 'src/ui/separator';
-
 import styles from './ArticleParamsForm.module.scss';
 import { RadioGroup } from 'src/ui/radio-group';
+import { useEffect, useState, useRef } from 'react';
 
-type ArticleSetting = {
-	fontFamilyOption: OptionType;
-	fontColor: OptionType;
-	backgroundColor: OptionType;
-	contentWidth: OptionType;
-	fontSizeOption: OptionType;
-};
+type ArticleSetting = typeof defaultArticleState;
 
 interface ArticleParamsFormProps {
-	tempSettings: ArticleSetting;
-	setTempSettings: React.Dispatch<React.SetStateAction<ArticleSetting>>;
-	onApply: () => void;
+	appliedSettings: ArticleSetting;
+	onApply: (newSettings: ArticleSetting) => void;
 	onReset: () => void;
 	isOpen: boolean;
 	onClose: () => void;
 }
 
 export const ArticleParamsForm = ({
-	tempSettings,
-	setTempSettings,
+	appliedSettings,
 	onApply,
 	onReset,
 	isOpen,
 	onClose,
 }: ArticleParamsFormProps) => {
+	const [formSettings, setFormSettings] = useState<ArticleSetting>(appliedSettings);
+	const asideRef = useRef<HTMLElement | null>(null);
+
+	useEffect(() => {
+		if (isOpen) {
+			setFormSettings(appliedSettings);
+		}
+	}, [isOpen, appliedSettings]);
+
+	useEffect(() => {
+		if (!isOpen) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				asideRef.current && !asideRef.current.contains(event.target as Node)
+			) {
+				onClose();
+			}
+		};
+
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', handleClickOutside);
+		};
+	}, [isOpen, onClose]);
+
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={onClose} />
-			<aside className={clsx(styles.container, isOpen && styles.container_open)}>
+			<aside
+			ref={asideRef}
+			className={clsx(styles.container, isOpen && styles.container_open)}>
 				<form className={styles.form}
 				onSubmit={(e) => {
 					e.preventDefault();
-					onApply();
+					onApply(formSettings);
 				}}
 				onReset={(e) => {
 					e.preventDefault();
 					onReset();
+					setFormSettings(defaultArticleState);
 				}}
 				>
 				<h2 className={styles.title_h2}>Задайте параметры</h2>
 				<Select
   					title="шрифт"
-  					selected={tempSettings.fontFamilyOption}
+  					selected={formSettings.fontFamilyOption}
   					options={fontFamilyOptions}
   					onChange={(newOption) =>
-    				setTempSettings({ ...tempSettings, fontFamilyOption: newOption })
+    				setFormSettings({ ...formSettings, fontFamilyOption: newOption })
   					}
 				/>
 				<RadioGroup
 					title="размер шрифта"
 					name="font-size"
-					selected={tempSettings.fontSizeOption}
+					selected={formSettings.fontSizeOption}
 					options={fontSizeOptions}
 					onChange={(newOption) => 
-					setTempSettings({...tempSettings, fontSizeOption: newOption })
+					setFormSettings({...formSettings, fontSizeOption: newOption })
 					}
 				/>
 				<Select
   					title="цвет шрифта"
-  					selected={tempSettings.fontColor}
+  					selected={formSettings.fontColor}
   					options={fontColors}
   					onChange={(newOption) =>
-    				setTempSettings({ ...tempSettings, fontColor: newOption })
+					setFormSettings({ ...formSettings, fontColor: newOption })
   					}
 				/>
 				<Separator
 				/>
 				<Select
   					title="цвет фона"
-  					selected={tempSettings.backgroundColor}
+  					selected={formSettings.backgroundColor}
   					options={backgroundColors}
   					onChange={(newOption) =>
-    				setTempSettings({ ...tempSettings, backgroundColor: newOption })
+					setFormSettings({ ...formSettings, backgroundColor: newOption })
   					}
 				/>
 				<Select
   					title="цвет контента"
-  					selected={tempSettings.contentWidth}
+  					selected={formSettings.contentWidth}
   					options={contentWidthArr}
   					onChange={(newOption) =>
-    				setTempSettings({ ...tempSettings, contentWidth: newOption })
+					setFormSettings({ ...formSettings, contentWidth: newOption })
   					}
 				/>
 					<div className={styles.bottomContainer}>
