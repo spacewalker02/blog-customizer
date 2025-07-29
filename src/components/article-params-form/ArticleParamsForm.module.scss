@@ -16,6 +16,7 @@
 	display: flex;
 	flex-shrink: 0;
 	flex-direction: column;
+	gap: 50px;
 	box-sizing: border-box;
 	width: 616px;
 	height: auto;
@@ -29,4 +30,14 @@
 	display: flex;
 	justify-content: space-between;
 	margin-top: auto;
+}
+
+.title_h2 {
+font-family: 'Open Sans';
+font-style: normal;
+font-weight: 800;
+font-size: 31px;
+line-height: 135%;
+text-transform: uppercase;
+color: #000000;
 }
